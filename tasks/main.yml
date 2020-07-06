@@ -69,6 +69,7 @@
 
 - name: Patch nginx configs
   include: nginx.yml
+  notify: restart nginx
 
 #- name: Configure Nginx now that the Modsec module is built
 #  import_role:

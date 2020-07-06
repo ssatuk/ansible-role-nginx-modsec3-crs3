@@ -1,4 +1,7 @@
 Include {{ nginx_conf_dir }}/modsec/modsecurity.conf
 Include {{ nginx_conf_dir }}/modsec/owasp-modsecurity-crs/crs-setup.conf
 Include {{ nginx_conf_dir }}/modsec/owasp-modsecurity-crs/rules/*.conf
+# Basic test rule
+SecRule ARGS:testparam "@contains test" "id:1234,deny,status:403"
+
 
