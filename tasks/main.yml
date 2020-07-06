@@ -6,6 +6,7 @@
     name: "{{ nginx_modsec3_crs3_debian_pre_reqs }}"
     state: present
   when: ansible_os_family == "Debian"
+  become: true
 
 - name: Installing Pre-Reqs for RHEL/Centos
   yum:
@@ -26,6 +27,7 @@
     name: "{{ nginx_modsec3_crs3_debian_compiler_reqs }}"
     state: present
   when: ansible_os_family == "Debian"
+  become: true
 
 - name: Installing compiler dependencies for RHEL/Centos
   yum:
@@ -40,18 +42,18 @@
     allow_duplicates: yes
   when: ansible_selinux and ansible_selinux.status == "enabled"
 
-- name: run Nginx nginx offical repo tasks
-  include_role:
-    name: ansible-role-nginx
-    tasks_from: nginx-official-repo.yml
-    allow_duplicates: yes
-  when: nginx_official_repo == True
+#- name: run Nginx nginx offical repo tasks
+#  include_role:
+#    name: ansible-role-nginx
+#    tasks_from: nginx-official-repo.yml
+#    allow_duplicates: yes
+#  when: nginx_official_repo == True
 
-- name: run Nginx install packages tasks
-  include_role:
-    name: ansible-role-nginx
-    tasks_from: installation.packages.yml
-    allow_duplicates: yes
+#- name: run Nginx install packages tasks
+#  include_role:
+#    name: ansible-role-nginx
+#    tasks_from: installation.packages.yml
+#    allow_duplicates: yes
 #  when: nginx_installation_type == "packages"
 
 - name: get the rpm or apt package facts
@@ -65,9 +67,9 @@
 - name: Compile ModSecurity3 and install OWAPS CRS3
   include: compile.yml
 
-- name: Configure Nginx now that the Modsec module is built
-  import_role:
-    name: ansible-role-nginx
+#- name: Configure Nginx now that the Modsec module is built
+#  import_role:
+#    name: ansible-role-nginx
 
 - name: Check which packages were installed for Debian/Ubuntu
   shell: dpkg-query -l > /tmp/after.txt

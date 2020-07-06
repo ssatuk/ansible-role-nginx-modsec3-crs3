@@ -20,8 +20,9 @@
     - "git submodule update"
     - "./build.sh"
     - "./configure"
-    - "make"
-    - "make install"
+    - "sudo make"
+    - "sudo make install"
+  
 
 - name: Obtain Modsecurity-nginx source code
   git:
@@ -57,7 +58,8 @@
 
 - name: import nginx role Debian/Ubuntu vars
   include_vars:
-    file: "../ansible-role-nginx/vars/Debian.yml"
+    #file: "../ansible-role-nginx/vars/Debian.yml"
+    file: "../webserver/vars/mod_security.yml"
   when:
     - ansible_os_family == "Debian"
     #- nginx_modules_location is not defined
@@ -78,48 +80,58 @@
 
 - name: Copy Modsecurity-nginx module to Nginx modules folder
   copy:
-    src: "~/Nginx/nginx-{{ nginx_modsec3_crs3_nginx_version }}/objs/ngx_http_modsecurity_module.so"
+    #src: "~/Nginx/nginx-{{ nginx_modsec3_crs3_nginx_version }}/objs/ngx_http_modsecurity_module.so"
+    src: "/home/{{ remote_user }}/Nginx/nginx-{{ nginx_modsec3_crs3_nginx_version }}/objs/ngx_http_modsecurity_module.so"
     dest: "{{ nginx_modules_location }}"
     remote_src: yes
+  become: yes
 
 - name: Create folder for Modsec config and rules
   file:
     #path: /etc/nginx/modsec
     path: "{{ nginx_conf_dir }}/modsec"
     state: directory
+  become: yes
 
 - name: Copy recommended conf to become modsecurity.conf
   copy:
-    src: "~/ModSecurity/modsecurity.conf-recommended"
+    #src: "~/ModSecurity/modsecurity.conf-recommended"
+    src: "/home/{{ remote_user }}/ModSecurity/modsecurity.conf-recommended"
     dest: "{{ nginx_conf_dir }}/modsec/modsecurity.conf"
     remote_src: yes
+  become: yes
 
 - name: Copy unicode.mapping file also
   copy:
-    src: "~/ModSecurity/unicode.mapping"
+    #src: "~/ModSecurity/unicode.mapping"
+    src: "/home/{{ remote_user }}/ModSecurity/unicode.mapping"
     dest: "{{ nginx_conf_dir }}/modsec/unicode.mapping"
     remote_src: yes
+  become: yes
 
 - name: Activate blocking rather than detection only
   replace:
     path: "{{ nginx_conf_dir }}/modsec/modsecurity.conf"
     regexp: "SecRuleEngine DetectionOnly"
     replace: "SecRuleEngine On"
+  become: yes
 
 - name: Create a main.conf from template
   template:
     src: main.conf.j2
     dest: "{{ nginx_conf_dir }}/modsec/main.conf"
+  become: yes
 
 - name: Obtain OWASP Modsecurity Rules
   git:
     repo: "https://github.com/SpiderLabs/owasp-modsecurity-crs"
     dest: "{{ nginx_conf_dir }}/modsec/owasp-modsecurity-crs"
     version: "v3.2/dev"
+  become: yes
 
 - name: Copy crs-setup.conf.example to become crs-setup.conf
   copy:
     src: "{{ nginx_conf_dir }}/modsec/owasp-modsecurity-crs/crs-setup.conf.example"
     dest: "{{ nginx_conf_dir }}/modsec/owasp-modsecurity-crs/crs-setup.conf"
     remote_src: yes
-
+  become: yes
