@@ -67,6 +67,9 @@
 - name: Compile ModSecurity3 and install OWAPS CRS3
   include: compile.yml
 
+- name: Patch nginx configs
+  include: nginx.yml
+
 #- name: Configure Nginx now that the Modsec module is built
 #  import_role:
 #    name: ansible-role-nginx

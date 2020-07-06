@@ -1,0 +1,7 @@
+- name: Add mod_security module in nginx.conf
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    line: 'load_module modules/ngx_http_modsecurity_module.so;'
+    insertbefore: BOF
+  become: yes
+  notify: restart nginx
